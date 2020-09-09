@@ -37,8 +37,8 @@ export default function Inputs() {
     const currentYear = Number(new Date().getFullYear());
     const numOfYears = year - currentYear;
     let calculatedFunds = [];
-    calculatedFunds.push({ type: "Traditional", data: [] });
-    calculatedFunds.push({ type: "Roth", data: [] });
+    calculatedFunds.push({ type: "traditional", data: [] });
+    calculatedFunds.push({ type: "roth", data: [] });
     for (let year = 0; year <= numOfYears; year++) {
       // traditional at index 0
       calculatedFunds[0].data.push({
@@ -56,18 +56,18 @@ export default function Inputs() {
   }
 
   const data = [
-    {name: 'Page A', uv: 4000, pv: 2400, amt: 2400},
-    {name: 'Page B', uv: 3000, pv: 1398, amt: 2210},
-    {name: 'Page C', uv: 2000, pv: 9800, amt: 2290},
-    {name: 'Page D', uv: 2780, pv: 3908, amt: 2000},
-    {name: 'Page E', uv: 1890, pv: 4800, amt: 2181},
-    {name: 'Page F', uv: 2390, pv: 3800, amt: 2500},
-    {name: 'Page G', uv: 3490, pv: 4300, amt: 2100},
-];
+    { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
+    { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
+    { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
+    { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
+    { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
+    { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
+    { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
+  ];
 
   return (
-    <div className="inputs-container d-flex flex-column" style={{width: "100%", height:"100%", position: "relative"}}>
-      {/* <div>
+    <div className="inputs-container d-flex flex-column" style={{ width: "100%", height: "100%", position: "relative" }}>
+      <div>
         <div>
           <label>Principal:</label>
           <input name="principal" onChange={handleChange} />
@@ -86,19 +86,23 @@ export default function Inputs() {
         </div>
         <button onClick={handleCalculate}>Calculate</button>
         <button>Reset</button>
-      </div> */}
-      <div className="visualizor">
-      <LineChart width={600} height={300} data={data}
-            margin={{top: 5, right: 30, left: 20, bottom: 5}}>
-       <XAxis dataKey="name"/>
-       <YAxis/>
-       <CartesianGrid strokeDasharray="3 3"/>
-       <Tooltip/>
-       <Legend />
-       <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{r: 8}}/>
-       <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-      </LineChart>
       </div>
+      {chart.length <= 0 ? null : (
+        <div className="visualizor" style={{ width: "100%", height: "300px" }}>
+          <ResponsiveContainer>
+            <LineChart width={730} height={250} data={chart}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" type="category" allowDuplicatedCategory={false} textAnchor="middle" height={55} />
+              <YAxis label={{ value: 'U.S. dollars ($)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip separator=": $"/>
+              <Legend />
+              <Line dataKey="value" data={chart[0].data} name="Traditional" stroke="#8884d8" />
+              <Line dataKey="value" data={chart[1].data} name="Roth"stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   )
 }
