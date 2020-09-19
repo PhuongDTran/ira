@@ -63,12 +63,49 @@ export default function Inputs() {
     console.log("calculated")
   }
 
-  const handleWithdraw = () => {
-
+  const handleDelete = (e) => {
+    let cloned = [...withdrawTable];
+    cloned.splice(e.target.value, 1); // remove element at index e.target.value
+    setwithdrawTable(cloned);
   }
 
   const handleAdd = () => {
-
+    let cloned = [...withdrawTable];
+    const newRow = (
+      <tr key={withdrawTable.length}>
+        <td><input name="year_withdraw" onChange={handleChange} /></td>
+        <td><input name="amount_withdraw" onChange={handleChange} /></td>
+        <td>
+          <div>
+            <div>
+              <label>Costs(tax, penalties):</label>
+              <input readOnly />
+            </div>
+            <div>
+              <label>Remaining:</label>
+              <input readOnly />
+            </div>
+          </div>
+        </td>
+        <td>
+          <div>
+            <div>
+              <label>Costs(tax, penalties):</label>
+              <input readOnly />
+            </div>
+            <div>
+              <label>Remaining:</label>
+              <input readOnly />
+            </div>
+          </div>
+        </td>
+        <td>
+          <button value={withdrawTable.length} onClick={handleDelete}>Delete</button>
+        </td>
+      </tr>
+    );
+    cloned.push(newRow)
+    setwithdrawTable(cloned);
   }
 
   // https://stackoverflow.com/questions/5191088/how-to-round-up-a-number-in-javascript
@@ -122,7 +159,7 @@ export default function Inputs() {
             </LineChart>
           </ResponsiveContainer>
           <div>
-            <table className="table">
+            <table className="withdraw-table table">
               <thead>
                 <tr>
                   <th scope="col">Year:</th>
@@ -133,29 +170,10 @@ export default function Inputs() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td><input name="year_withdraw" onChange={handleChange}/></td>
-                  <td><input name="amount_withdraw" onChange={handleChange}/></td>
-                  <td>
-                    <div>
-                      <div>
-                        <label>Costs(tax, penalties):</label>
-                        <input readOnly/>
-                      </div>
-                      <div>
-                        <label>Remaining:</label>
-                        <input readOnly/>
-                      </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div>
-                        <button onChange={handleAdd}>Add</button>
-                      </div>
-                    </td>
-                </tr>
+                {withdrawTable}
               </tbody>
             </table>
+            <button onClick={handleAdd}>Add New Row</button>
             {/* <div>
               <label>Year to Withdraw:</label>
               <input type="number" name="year_withdraw"/>
