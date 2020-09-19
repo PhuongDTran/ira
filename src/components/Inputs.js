@@ -12,7 +12,10 @@ export default function Inputs() {
     annual_contribution: 0,
     interest_rate: 0,
     senior_interest_rate: 0,
-    year: 0
+    year_retire: 0,
+    year_withdraw: 0,
+    amount_withdraw: 0,
+    penalty: 0
   });
 
   // array of objects where each object has the following format:
@@ -21,7 +24,7 @@ export default function Inputs() {
   //    data: [{year: 2001, value:1000}, {year: 2002, value:1200}]
   // }
   const [chart, setChart] = useState([]);
-
+  const [withdrawTable, setwithdrawTable] = useState([]);
 
   const isStateValid = () => {
 
@@ -38,9 +41,9 @@ export default function Inputs() {
   }
 
   const handleCalculate = () => {
-    const { principal, tax_rate, interest_rate, year } = localState;
+    const { principal, tax_rate, interest_rate, year_retire } = localState;
     const currentYear = Number(new Date().getFullYear());
-    const numOfYears = year - currentYear;
+    const numOfYears = year_retire - currentYear;
     let calculatedFunds = [];
     calculatedFunds.push({ type: "traditional", data: [] });
     calculatedFunds.push({ type: "roth", data: [] });
@@ -57,13 +60,22 @@ export default function Inputs() {
       });
     }
     setChart(calculatedFunds);
+    console.log("calculated")
   }
 
-    // https://stackoverflow.com/questions/5191088/how-to-round-up-a-number-in-javascript
-    function roundUp(num, precision) {
-      precision = Math.pow(10, precision)
-      return Math.ceil(num * precision) / precision
-    }
+  const handleWithdraw = () => {
+
+  }
+
+  const handleAdd = () => {
+
+  }
+
+  // https://stackoverflow.com/questions/5191088/how-to-round-up-a-number-in-javascript
+  function roundUp(num, precision) {
+    precision = Math.pow(10, precision)
+    return Math.ceil(num * precision) / precision
+  }
 
   return (
     <div className="inputs-container d-flex flex-column justify-content-center" style={{ width: "100%", height: "100%", position: "relative" }}>
@@ -90,7 +102,7 @@ export default function Inputs() {
         </div>
         <div>
           <label>Year to Reach 60: </label>
-          <input name="year" type="number" onChange={handleChange} />
+          <input name="year_retire" type="number" onChange={handleChange} />
         </div>
         <button onClick={handleCalculate}>Calculate</button>
         <button>Reset</button>
@@ -101,14 +113,66 @@ export default function Inputs() {
             <LineChart width={730} height={250} data={chart}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" type="category" allowDuplicatedCategory={false} textAnchor="middle" height={60} label={{ value: 'Year'}} />
+              <XAxis dataKey="year" type="category" allowDuplicatedCategory={false} textAnchor="middle" height={60} label={{ value: 'Year' }} />
               <YAxis label={{ value: 'U.S. dollars ($)', angle: -90, position: 'insideLeft' }} />
               <Tooltip separator=": $" />
               <Legend />
               <Line dataKey="value" data={chart[0].data} name="Traditional" stroke="#8884d8" dot={false} />
-              <Line dataKey="value" data={chart[1].data} name="Roth" stroke="#82ca9d" dot={false}/>
+              <Line dataKey="value" data={chart[1].data} name="Roth" stroke="#82ca9d" dot={false} />
             </LineChart>
           </ResponsiveContainer>
+          <div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Year:</th>
+                  <th scope="col">Amount($):</th>
+                  <th scope="col">Tradition IRA</th>
+                  <th scope="col">Roth IRA</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input name="year_withdraw" onChange={handleChange}/></td>
+                  <td><input name="amount_withdraw" onChange={handleChange}/></td>
+                  <td>
+                    <div>
+                      <div>
+                        <label>Costs(tax, penalties):</label>
+                        <input readOnly/>
+                      </div>
+                      <div>
+                        <label>Remaining:</label>
+                        <input readOnly/>
+                      </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <button onChange={handleAdd}>Add</button>
+                      </div>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+            {/* <div>
+              <label>Year to Withdraw:</label>
+              <input type="number" name="year_withdraw"/>
+            </div>
+            <div>
+              <label>Amount($):</label>
+              <input type="number" name="amount_withdraw"/>
+            </div>
+            <div>
+              <label>Penalty:</label>
+              <input readOnly name="penalty" value={localState.penalty}/>
+            </div>
+            <div>
+              <button onClick={handleChange}>Withdraw</button>
+              <button>Reset</button>
+            </div> */}
+          </div>
         </div>
       )}
     </div>
