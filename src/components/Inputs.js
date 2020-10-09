@@ -35,7 +35,7 @@ export default function Inputs() {
       alert("Please enter a valid number");
     } else {
       let clonedLocalState = { ...localState };
-      clonedLocalState[e.target.name] = e.target.value;
+      clonedLocalState[e.target.name] = Number(e.target.value);
       setLocalState(clonedLocalState);
     }
   }
@@ -84,8 +84,8 @@ export default function Inputs() {
       return;
     }
     let row = {};
-    row.year = Number(withdraw_year);
-    row.amount = Number(withdraw_amount);
+    row.year = withdraw_year;
+    row.amount = withdraw_amount;
     // Traditional computations
     row.traditional = {};
     row.traditional.costs = computeTraditionalPenalty(withdraw_amount);
@@ -98,10 +98,19 @@ export default function Inputs() {
     cloned.push(row);
     cloned.sort((o1, o2) => o1.year - o2.year);
     setWithdrawTable(cloned);
+
+
     // reset, get ready for next row
     setLocalState({ ...localState, withdraw_amount: 0, withdraw_year: 0 });
   }
 
+  const recalculateChart = (withdrawYear, withdrawAmount) => {
+    const currentYear = Number(new Date().getFullYear());
+    const yearIndex = withdrawYear - currentYear;
+    for (let i = yearIndex; i < (localState.year_retire - currentYear); i++) {
+
+    }
+  }
   // https://stackoverflow.com/questions/5191088/how-to-round-up-a-number-in-javascript
   function roundUp(num, precision) {
     precision = Math.pow(10, precision)
@@ -138,7 +147,7 @@ export default function Inputs() {
         <button onClick={handleCalculate}>Calculate</button>
         <button>Reset</button>
       </div>
-      {/* {chart.length <= 0 || chart[0].data.length <= 0 ? null : (
+      {chart.length <= 0 || chart[0].data.length <= 0 ? null : (
         <div className="visualizor" style={{ width: "100%", height: "300px" }}>
           <ResponsiveContainer>
             <LineChart width={730} height={250} data={chart}
@@ -151,80 +160,62 @@ export default function Inputs() {
               <Line dataKey="value" data={chart[0].data} name="Traditional" stroke="#8884d8" dot={false} />
               <Line dataKey="value" data={chart[1].data} name="Roth" stroke="#82ca9d" dot={false} />
             </LineChart>
-          </ResponsiveContainer> */}
-      <div>
-        <table className="withdraw-table table">
-          <thead>
-            <tr>
-              <th scope="col">Year:</th>
-              <th scope="col">Amount($):</th>
-              <th scope="col">Traditional IRA</th>
-              <th scope="col">Roth IRA</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {withdrawTable.map( (e,i) =>
-              <tr key={i}>
-              <td><input name="withdraw_year" value={e.year} readOnly /></td>
-              <td><input name="withdraw_amount" value={e.amount} readOnly /></td>
-              <td>
-                <div>
-                  <div>
-                    <label>Costs(tax, penalties): {e.traditional.costs}</label>
-                  </div>
-                  <div>
-                    <label>Remaining: {e.traditional.remaining}</label>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <div>
-                    <label>Costs(tax, penalties): {e.roth.costs}</label>
-                  </div>
-                  <div>
-                    <label>Remaining:{e.roth.remaining}</label>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <button value={i} onClick={handleDelete}>Delete</button>
-              </td>
-            </tr>
-            )}
-            <tr key={withdrawTable.length}>
-              <td><input name="withdraw_year" onChange={handleChange} /></td>
-              <td><input name="withdraw_amount" onChange={handleChange} /></td>
-              <td>
-                {/* <div>
-                  <div>
-                    <label>Costs(tax, penalties): </label>
-                  </div>
-                  <div>
-                    <label>Remaining: </label>
-                  </div>
-                </div> */}
-              </td>
-              <td>
-                {/* <div>
-                  <div>
-                    <label>Costs(tax, penalties): </label>
-                  </div>
-                  <div>
-                    <label>Remaining:</label>
-                  </div>
-                </div> */}
-              </td>
-              <td>
-                <button value={withdrawTable.length} onClick={handleAdd}>Add</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          </ResponsiveContainer>
+          <div>
+            <table className="withdraw-table table">
+              <thead>
+                <tr>
+                  <th scope="col">Year:</th>
+                  <th scope="col">Amount($):</th>
+                  <th scope="col">Traditional IRA</th>
+                  <th scope="col">Roth IRA</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {withdrawTable.map((e, i) =>
+                  <tr key={i}>
+                    <td><input name="withdraw_year" value={e.year} readOnly /></td>
+                    <td><input name="withdraw_amount" value={e.amount} readOnly /></td>
+                    <td>
+                      <div>
+                        <div>
+                          <label>Costs(tax, penalties): {e.traditional.costs}</label>
+                        </div>
+                        <div>
+                          <label>Remaining: {e.traditional.remaining}</label>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <div>
+                          <label>Costs(tax, penalties): {e.roth.costs}</label>
+                        </div>
+                        <div>
+                          <label>Remaining:{e.roth.remaining}</label>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <button value={i} onClick={handleDelete}>Delete</button>
+                    </td>
+                  </tr>
+                )}
+                <tr key={withdrawTable.length}>
+                  <td><input name="withdraw_year" onChange={handleChange} /></td>
+                  <td><input name="withdraw_amount" onChange={handleChange} /></td>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <button value={withdrawTable.length} onClick={handleAdd}>Add</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
-    //   )}
-    // </div>
   )
 }
