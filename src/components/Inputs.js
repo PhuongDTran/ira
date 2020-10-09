@@ -14,8 +14,8 @@ export default function Inputs() {
     interest_rate: 0,
     senior_tax_rate: 0,
     year_retire: 0,
-    year_withdraw: 0,
-    amount_withdraw: 0,
+    withdraw_year: 0,
+    withdraw_amount: 0,
   });
 
   // array of objects where each object has the following format:
@@ -60,7 +60,15 @@ export default function Inputs() {
       });
     }
     setChart(calculatedFunds);
-    console.log("calculated")
+  }
+
+  const computeTraditionalPenalty = (withdrawAmount) => {
+    const { tax_rate } = localState;
+    return Number(withdrawAmount) * (tax_rate + 0.1);
+  }
+
+  const computeRothPenalty = () => {
+    return 0
   }
 
   const handleDelete = (e) => {
@@ -69,54 +77,29 @@ export default function Inputs() {
     setWithdrawTable(cloned);
   }
 
-  const computeTraditionalPenalty = (withdrawAmount) => {
-    const { tax_rate } = localState;
-    console.log(withdrawAmount)
-    return Number(withdrawAmount) * (tax_rate + 0.1);
-  }
-
-  const computeRothPenalty = () => {
-    return 0
-  }
-  // const generateRow =(year, amount, )
   const handleAdd = () => {
     let cloned = [...withdrawTable];
-    const { amount_withdraw, year_withdraw } = localState;
-    if (amount_withdraw === 0 || year_withdraw === 0) {
+    const { withdraw_amount, withdraw_year } = localState;
+    if (withdraw_amount === 0 || withdraw_year === 0) {
       return;
     }
-    const newRow = (
-      <tr key={withdrawTable.length}>
-        <td><input name="year_withdraw" value={year_withdraw} readOnly/></td>
-        <td><input name="amount_withdraw" value={amount_withdraw} readOnly/></td>
-        <td>
-          <div>
-            <div>
-              <label>Costs(tax, penalties): {computeTraditionalPenalty(amount_withdraw)}</label>
-            </div>
-            <div>
-              <label>Remaining: {amount_withdraw - computeTraditionalPenalty(amount_withdraw)}</label>
-            </div>
-          </div>
-        </td>
-        <td>
-          <div>
-            <div>
-              <label>Costs(tax, penalties): {computeRothPenalty(amount_withdraw)}</label>
-            </div>
-            <div>
-              <label>Remaining:{amount_withdraw - computeRothPenalty(amount_withdraw)}</label>
-            </div>
-          </div>
-        </td>
-        <td>
-          <button value={withdrawTable.length} onClick={handleDelete}>Delete</button>
-        </td>
-      </tr>
-    );
-    setLocalState({...localState, amount_withdraw: 0, year_withdraw: 0});
-    cloned.push(newRow)
+    let row = {};
+    row.year = Number(withdraw_year);
+    row.amount = Number(withdraw_amount);
+    // Traditional computations
+    row.traditional = {};
+    row.traditional.costs = computeTraditionalPenalty(withdraw_amount);
+    row.traditional.remaining = withdraw_amount - computeTraditionalPenalty(withdraw_amount);
+    // Roth computations
+    row.roth = {};
+    row.roth.costs = computeRothPenalty(withdraw_amount);
+    row.roth.remaining = withdraw_amount - computeRothPenalty(withdraw_amount);
+
+    cloned.push(row);
+    cloned.sort((o1, o2) => o1.year - o2.year);
     setWithdrawTable(cloned);
+    // reset, get ready for next row
+    setLocalState({ ...localState, withdraw_amount: 0, withdraw_year: 0 });
   }
 
   // https://stackoverflow.com/questions/5191088/how-to-round-up-a-number-in-javascript
@@ -181,10 +164,38 @@ export default function Inputs() {
             </tr>
           </thead>
           <tbody>
-            {withdrawTable}
+            {withdrawTable.map( (e,i) =>
+              <tr key={i}>
+              <td><input name="withdraw_year" value={e.year} readOnly /></td>
+              <td><input name="withdraw_amount" value={e.amount} readOnly /></td>
+              <td>
+                <div>
+                  <div>
+                    <label>Costs(tax, penalties): {e.traditional.costs}</label>
+                  </div>
+                  <div>
+                    <label>Remaining: {e.traditional.remaining}</label>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div>
+                  <div>
+                    <label>Costs(tax, penalties): {e.roth.costs}</label>
+                  </div>
+                  <div>
+                    <label>Remaining:{e.roth.remaining}</label>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <button value={i} onClick={handleDelete}>Delete</button>
+              </td>
+            </tr>
+            )}
             <tr key={withdrawTable.length}>
-              <td><input name="year_withdraw" onChange={handleChange} /></td>
-              <td><input name="amount_withdraw" onChange={handleChange} /></td>
+              <td><input name="withdraw_year" onChange={handleChange} /></td>
+              <td><input name="withdraw_amount" onChange={handleChange} /></td>
               <td>
                 {/* <div>
                   <div>
